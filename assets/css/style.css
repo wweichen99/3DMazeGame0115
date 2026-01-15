@@ -1,0 +1,183 @@
+:root {
+    --bg-color: #0B132B;
+    --panel-bg: rgba(0, 20, 40, 0.7);
+    --accent-color: #FFD700;
+    --text-color: #FFFFFF;
+    --border-color: rgba(255, 255, 255, 0.3);
+}
+
+body.theme-day {
+    --bg-color: #F0F4F8;
+    --panel-bg: rgba(255, 255, 255, 0.85);
+    --accent-color: #1C2541;
+    --text-color: #0B132B;
+    --border-color: rgba(0, 0, 0, 0.15);
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: var(--bg-color);
+    width: 100vw;
+    height: 100vh;
+}
+
+#canvasContainer {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+}
+
+#ui-layer {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+    z-index: 1000;
+    display: flex;
+    justify-content: space-between;
+    padding: 2vh 2vw;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    opacity: 0;
+    transition: opacity 1s;
+}
+
+.hud-panel, #hud-top {
+    pointer-events: auto;
+}
+
+#hud-left, #hud-right {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 2vh;
+}
+
+/* 响应式摄像头容器 */
+.webcam-container {
+    width: clamp(120px, 15vw, 180px);
+    height: clamp(120px, 15vw, 180px);
+    border-radius: 50%;
+    border: 3px solid var(--accent-color);
+    box-shadow: 0 0 15px var(--accent-color);
+    overflow: hidden;
+    background: #000;
+    position: relative;
+}
+
+#webgazer-target {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+}
+
+.scanner-overlay {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    border-radius: 50%;
+    background: linear-gradient(180deg, transparent 0%, var(--accent-color) 50%, transparent 100%);
+    background-size: 100% 200%;
+    animation: scan 3s linear infinite;
+    pointer-events: none;
+    opacity: 0.2;
+}
+
+@keyframes scan {
+    0% { background-position: 0% -100%; }
+    100% { background-position: 0% 200%; }
+}
+
+/* 响应式小地图容器 */
+#minimap-container {
+    width: clamp(150px, 20vw, 250px);
+    height: clamp(150px, 20vw, 250px);
+    background: var(--panel-bg);
+    backdrop-filter: blur(5px);
+    border: 2px solid var(--border-color);
+    border-radius: 15px;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#minimap, #objects {
+    position: absolute;
+    max-width: 95%;
+    max-height: 95%;
+    object-fit: contain;
+}
+
+#hud-top {
+    position: fixed;
+    top: 2vh; left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(10px);
+    padding: 0.5rem 1.5rem;
+    border-radius: 30px;
+    border: 1px solid var(--border-color);
+    display: flex; gap: 1rem;
+    z-index: 1001;
+}
+
+.hud-btn {
+    background: transparent;
+    border: none;
+    color: white;
+    width: clamp(30px, 4vw, 40px);
+    height: clamp(30px, 4vw, 40px);
+    cursor: pointer;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s;
+}
+
+.hud-btn svg { width: 70%; height: 70%; }
+.hud-btn:hover { background: rgba(255, 255, 255, 0.2); color: var(--accent-color); }
+
+/* Setup Screen 响应式修改 */
+#setup-screen {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw; height: 100vh;
+    background: var(--bg-color);
+    z-index: 2000;
+    display: flex; justify-content: center; align-items: center;
+}
+
+.setup-box {
+    width: 90%;
+    max-width: 500px;
+    text-align: center;
+    border: 2px solid var(--accent-color);
+    padding: 2rem;
+    border-radius: 20px;
+    background: var(--panel-bg);
+    color: var(--text-color);
+    box-sizing: border-box;
+}
+
+.setup-box h1 {
+    font-size: clamp(1.5rem, 5vw, 2.5rem);
+    margin-bottom: 1.5rem;
+}
+
+.setup-btn {
+    width: 100%;
+    margin-bottom: 1rem;
+    background: transparent;
+    border: 1px solid var(--border-color);
+    color: var(--text-color);
+    padding: 1.5rem; border-radius: 10px;
+    cursor: pointer; transition: 0.3s;
+    font-size: 1rem;
+}
+
+.setup-btn:hover { border-color: var(--accent-color); background: rgba(255,215,0,0.1); }
