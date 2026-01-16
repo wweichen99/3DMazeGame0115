@@ -11,7 +11,7 @@
     var _keys = { w: false, a: false, s: false, d: false };
     var _skipFirstMouseMove = false;
 
-    // === 火灾与烟雾系统 ===
+    // === Fire and Smoke System ===
     var fireSystem, smokeSystem;
     var fireParticles = 1500;
     var smokeParticles = 2000;
@@ -23,31 +23,31 @@
     var exitPosition = new THREE.Vector3(); 
     var warmUpTimer = 0;
 
-    // === 数据记录与地图缩放 ===
+    // === Data Logging and Map Scaling ===
     var viewportLogs = [], minimapLogs = { hovers: {} }, gazeLogs = []; 
     var lastLogTime = 0, LOG_INTERVAL = 250; 
     var gazeBuffer = [], GAZE_BUFFER_SIZE = 8;
     
-    // 自适应小地图缩放倍率
+    // Adaptive minimap scale factor
     var mapScale = 16; 
 
     function $(id){ return document.getElementById(id); }
     function isWallCellByValue(v){ return (v != 1 && !isNaN(v)); }
 
     /**
-     * 自适应功能：根据容器大小动态计算小地图缩放比例
+     * Adaptive feature: Dynamically calculate minimap scale based on container size
      */
     function calculateMapScale() {
         var container = $("minimap-container");
         if (!container || map.length === 0) return 16;
         var rect = container.getBoundingClientRect();
-        // 留出5%的边距
+        // Leave a 5% margin
         var availableSize = Math.min(rect.width, rect.height) * 0.95;
         var mazeMaxDim = Math.max(map.length, map[0].length);
         return availableSize / mazeMaxDim;
     }
 
-    // === 辅助函数：创建粒子纹理 ===
+    // === Helper Function: Create Particle Texture ===
     function createParticleTexture() {
         var canvas = document.createElement('canvas');
         canvas.width = 64; canvas.height = 64;
@@ -63,7 +63,7 @@
         return tex;
     }
 
-    // === 辅助函数：创建文字精灵 ===
+    // === Helper Function: Create Text Sprite ===
     function createTextSprite(message) {
         var canvas = document.createElement('canvas');
         canvas.width = 512; canvas.height = 256;
@@ -78,14 +78,14 @@
         return sprite;
     }
 
-    // === 游戏入口 ===
+    // === Game Entry Point ===
     window.startGame = function(mode) {
         experimentMode = mode;
         $('setup-screen').style.display = 'none';
         startCalibrationPhase();
     };
 
-    // === 校准逻辑 ===
+    // === Calibration Logic ===
     var calibPoints = [[10,10], [50,10], [90,10], [10,50], [50,50], [90,50], [10,90], [50,90], [90,90]];
     var currentPointIdx = 0, clicksPerPoint = 5, currentClicks = 0;
 
@@ -119,7 +119,7 @@
         initializeEngine();
         configureUIForMode(experimentMode);
         levelHelper = new Demonixis.GameHelper.LevelHelper();
-        loadLevel(5); // 加载练习关卡
+        loadLevel(5); // Load practice level
     }
 
     function initWebGazer() {
@@ -135,7 +135,7 @@
             }).begin();
             webgazer.showVideoPreview(true).showPredictionPoints(true);
             
-            // 将 WebGazer 视频流移动到 HUD 容器
+            // Move WebGazer video stream to HUD container
             var moveUI = setInterval(function(){
                 var v = $('webgazerVideoFeed'), t = $('webgazer-target');
                 if (v && t && v.parentElement !== t) {
@@ -149,12 +149,12 @@
         }
     }
 
-    // === 引擎初始化 (核心修改：自适应窗口) ===
+    // === Engine Initialization (Window Adaptability) ===
     function initializeEngine() {
         if (renderer) return; 
         renderer = new THREE.WebGLRenderer({ antialias: true });
         
-        // 关键：适配高 DPI 屏幕 (Retina / 4K)
+        // Support high DPI screens (Retina / 4K)
         renderer.setPixelRatio(window.devicePixelRatio);
         renderer.setSize(window.innerWidth, window.innerHeight);
         
@@ -171,21 +171,21 @@
         setupPointerLock();
         setupMinimapTracking();
 
-        // 关键：监听窗口缩放
+        // Listen for window resize
         window.addEventListener("resize", function() {
             var w = window.innerWidth;
             var h = window.innerHeight;
             renderer.setSize(w, h);
             camera.aspect = w / h;
             camera.updateProjectionMatrix();
-            drawMiniMapStatic(); // 窗口变化时重新计算小地图缩放
+            drawMiniMapStatic(); // Recalculate minimap scale on resize
         });
 
         window.addEventListener("keydown", (e) => { if(_keys.hasOwnProperty(e.key.toLowerCase())) _keys[e.key.toLowerCase()] = true; });
         window.addEventListener("keyup", (e) => { if(_keys.hasOwnProperty(e.key.toLowerCase())) _keys[e.key.toLowerCase()] = false; });
     }
 
-    // === 火灾模拟逻辑 ===
+    // === Fire Simulation Logic ===
     function initFireEffects() {
         if (isWarmUp) return; 
         fireRadius = 0; 
@@ -223,11 +223,13 @@
         if (scene.fog.density < maxFog) scene.fog.density += (experimentMode === 'xray' ? 0.000002 : 0.000008);
 
         if (fireRadius > fireGraceRadius && camera.position.distanceTo(fireSourcePosition) < fireRadius) {
-            running = false; alert("你被大火吞噬了！逃生失败。"); location.reload(); 
+            running = false; 
+            alert("You have been consumed by the fire! Escape failed."); 
+            location.reload(); 
         }
     }
 
-    // === 移动控制与碰撞检测 ===
+    // === Movement Control and Collision Detection ===
     function moveCamera(dir) {
         if (!running) return;
         var dx = 0, dz = 0, rot = camera.rotation.y;
@@ -254,9 +256,11 @@
         running = false;
         for (var k in _keys) _keys[k] = false;
         if (isWarmUp) {
-            isWarmUp = false; alert("正式开始：请迅速逃向出口（绿色光柱）！"); loadLevel(1); 
+            isWarmUp = false; 
+            alert("Experiment officially started: Please escape to the exit (green light pillar) quickly!"); 
+            loadLevel(1); 
         } else {
-            alert("成功逃生！请点击下载实验日志。");
+            alert("Escape successful! Please click to download the experiment logs.");
         }
     }
 
@@ -277,7 +281,7 @@
         }
     }
 
-    // === 场景加载 ===
+    // === Scene Loading ===
     function initializeScene() {
         while(scene.children.length > 0){ scene.remove(scene.children[0]); }
         var loader = new THREE.TextureLoader();
@@ -336,11 +340,11 @@
         });
     }
 
-    // === 小地图绘制 (核心修改：动态 Scale) ===
+    // === Minimap Drawing (Dynamic Scale) ===
     function drawMiniMapStatic() {
         var mm = $("minimap"), o = $("objects"); if (!mm || !o || map.length === 0) return;
         
-        mapScale = calculateMapScale(); // 动态计算
+        mapScale = calculateMapScale(); 
         mm.width = o.width = map[0].length * mapScale; 
         mm.height = o.height = map.length * mapScale;
         
