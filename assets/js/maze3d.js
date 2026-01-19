@@ -119,7 +119,8 @@
         initializeEngine();
         configureUIForMode(experimentMode);
         levelHelper = new Demonixis.GameHelper.LevelHelper();
-        loadLevel(5); // Load practice level
+        // 修改点：校准完成后加载你的自定义地图 8
+        loadLevel(8); 
     }
 
     function initWebGazer() {
@@ -258,7 +259,8 @@
         if (isWarmUp) {
             isWarmUp = false; 
             alert("Experiment officially started: Please escape to the exit (green light pillar) quickly!"); 
-            loadLevel(1); 
+            // 修改点：练习结束后加载正式地图 8
+            loadLevel(8); 
         } else {
             alert("Escape successful! Please click to download the experiment logs.");
         }
@@ -292,7 +294,7 @@
         scene.add(new THREE.Mesh(new THREE.BoxGeometry(pW, 5, pH), new THREE.MeshPhongMaterial({ map: loader.load("assets/images/textures/roof_diffuse.jpg") })).translateY(100));
         
         var wallGeo = new THREE.BoxGeometry(100, 100, 100), wallMat = new THREE.MeshPhongMaterial({ map: loader.load("assets/images/textures/wall_diffuse.jpg") });
-        var xrayMat = new THREE.MeshBasicMaterial({ color: 0x0066ff, transparent: true, opacity: 0.15, depthWrite: false });
+        var xrayMat = new THREE.MeshBasicMaterial({ color: 0x0066ff, transparent: true, opacity: 0.3, depthWrite: false });
 
         for (var y = 0; y < map.length; y++) {
             for (var x = 0; x < map[y].length; x++) {
@@ -301,11 +303,17 @@
                     var m = new THREE.Mesh(wallGeo, experimentMode === 'minimap' ? wallMat : xrayMat);
                     m.position.set(px, 50, pz); scene.add(m);
                     if (experimentMode === 'xray') {
-                        var wire = new THREE.LineSegments(new THREE.EdgesGeometry(wallGeo), new THREE.LineBasicMaterial({ color: 0x00ccff, transparent: true, opacity: 0.5 }));
+                        var wire = new THREE.LineSegments(new THREE.EdgesGeometry(wallGeo), new THREE.LineBasicMaterial({ color: 0x00ccff, transparent: true, opacity: 0.6 }));
                         wire.position.set(px, 50, pz); scene.add(wire);
                     }
                 }
-                if (map[y][x] === "D") { camera.position.set(px, 50, pz); fireSourcePosition.set(px, 50, pz); }
+                // 修改点：解耦玩家起点与火源位置
+                if (map[y][x] === "D") { 
+                    camera.position.set(px, 50, pz); 
+                }
+                if (map[y][x] === "F") {
+                    fireSourcePosition.set(px, 50, pz); 
+                }
                 if (map[y][x] === "A") {
                     var exit = new THREE.Mesh(new THREE.BoxGeometry(20, 100, 20), new THREE.MeshBasicMaterial({ color: 0x00ff00, transparent: true, opacity: 0.6 }));
                     exit.position.set(px, 50, pz); scene.add(exit);
@@ -320,6 +328,7 @@
 
     function mainLoop() { if (running) { update(); renderer.render(scene, camera); requestAnimationFrame(mainLoop); } }
     
+    // 修改点：修复语法错误，将 8 更改为变量 l
     function loadLevel(l) {
         var ajax = new XMLHttpRequest(); ajax.open("GET", "assets/maps/maze3d-" + l + ".json", true);
         ajax.onreadystatechange = function() { 
